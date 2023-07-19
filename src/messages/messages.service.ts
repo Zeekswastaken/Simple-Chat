@@ -2,34 +2,44 @@ import { Injectable } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Message } from './entities/message.entity'
+import { Repository, ReturnDocument } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { lstat } from 'fs';
+
+
 @Injectable()
 export class MessagesService {
   
-  messages: Message[] = [{ name: 'Zeeks', text: 'Testu'}];
-  clientToUser = {};
+  constructor(
+    @InjectRepository(Message) private messageRepository: Repository<Message>,) {}
   //DO THIS WITH A DATABASE
-  identify(name: string, clientId: string)
+  // identify(name: string, clientId: string)
+  // {
+  //   this.clientToUser[clientId] = name;
+  //   //ADD A SELECT WUERY
+  //   return Object.values(this.clientToUser);
+  // }
+
+  async getClientName(clientId: string)
   {
-    this.clientToUser[clientId] = name;
-    //ADD A SELECT WUERY
-    return Object.values(this.clientToUser);
+    const id = await this.messageRepository.findOne({where:{id : clientId}});
+    if (id)
+      return id.name;
+    else
+      return null;
   }
 
-  getClientName(clientId: string)
-  {
-    return this.clientToUser[clientId];
-  }
-  create(createMessageDto: CreateMessageDto, clientId: string) {
-    const message = {name: this.clientToUser[clientId], text: createMessageDto.text};
-    this.messages.push(message);
-    //INSERT TO DATABASE
-    return message;
+  async createMessage(createMessageDto: CreateMessageDto, clientId: string) {
+    const message = {
+      id: createMessageDto.id,
+      name: createMessageDto.name,
+      text: createMessageDto.text,
+    }
+    return await this.messageRepository.save(message);
   }
 
-  findAll() {
-    console.log("=-=-=-=-=-=-=-=-> ", this.messages)
-    return this.messages;
-    //JUST ADD A SELECT QUERY LUL
+  async findAll() : Promise<Message[]> {
+    return this.messageRepository.find();
   }
 
 }

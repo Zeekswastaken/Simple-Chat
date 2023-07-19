@@ -6,10 +6,10 @@ export declare class MessagesGateway {
     server: Server;
     constructor(messagesService: MessagesService);
     create(createMessageDto: CreateMessageDto, client: Socket): Promise<{
-        name: any;
+        id: string;
+        name: string;
         text: string;
-    }>;
-    findAll(): import("./entities/message.entity").Message[];
-    joinRoom(name: string, client: Socket): unknown[];
+    } & import("./entities/message.entity").Message>;
+    findAll(): Promise<import("./entities/message.entity").Message[]>;
     typing(isTyping: boolean, client: Socket): Promise<void>;
 }

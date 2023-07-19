@@ -22,17 +22,14 @@ let MessagesGateway = exports.MessagesGateway = class MessagesGateway {
         this.messagesService = messagesService;
     }
     async create(createMessageDto, client) {
-        const message = await this.messagesService.create(createMessageDto, client.id);
+        console.log("====> ", client.id);
+        const message = await this.messagesService.createMessage(createMessageDto, client.id);
         console.log("==========> ", message);
         this.server.emit('message', message);
         return message;
     }
     findAll() {
         return this.messagesService.findAll();
-    }
-    joinRoom(name, client) {
-        console.log("It worked");
-        return this.messagesService.identify(name, client.id);
     }
     async typing(isTyping, client) {
         const name = await this.messagesService.getClientName(client.id);
@@ -57,14 +54,6 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], MessagesGateway.prototype, "findAll", null);
-__decorate([
-    (0, websockets_1.SubscribeMessage)('join'),
-    __param(0, (0, websockets_1.MessageBody)('name')),
-    __param(1, (0, websockets_1.ConnectedSocket)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, socket_io_1.Socket]),
-    __metadata("design:returntype", void 0)
-], MessagesGateway.prototype, "joinRoom", null);
 __decorate([
     (0, websockets_1.SubscribeMessage)('typing'),
     __param(0, (0, websockets_1.MessageBody)('isTyping')),
